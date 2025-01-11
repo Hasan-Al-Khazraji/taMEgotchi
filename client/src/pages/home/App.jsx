@@ -1,8 +1,13 @@
+import LoginButton from "../../components/loginButton";
+import Profile from "../../components/profile";
+import LogoutButton from "../../components/logoutButton";
 
 function App() {
   return (
     <div className="App">
-      <h1>Home page</h1>
+      <LoginButton></LoginButton>
+      <Profile></Profile>
+      <LogoutButton></LogoutButton>
     </div>
   );
 }
