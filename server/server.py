@@ -115,11 +115,12 @@ def update_sleep():
 
         utils.update(document, collection, 'sleep', sleep_field)
 
-        master_value = coherebot.generate_chat_response('sleep', collection)
+        # master_value = coherebot.generate_chat_response('sleep', collection)
 
         return jsonify(
             {
-                "message": "Updated sleep"
+                "message": "Updated sleep",
+                "category" : "sleep"
             }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -136,31 +137,46 @@ def update_nutrition():
 
         email = data['email']
         food = data['activity']
-        quantity = int(data['quantity']) # TODO: make sure key is actually quantity
-        document = collection.find_one(
-            {'email' : email}
-        )
+        quantity = int(data['quantity'])
+        
+        document = collection.find_one({'email': email})
+        current_time = datetime.now()
 
         if 'nutrition' in document:
             last_time = document['nutrition']['last_time']
-
+            
             if utils.is_different_day(last_time):
-                utils.update(document, collection, 'nutrition.food', {})
-
-        nutrition_field = {
-            'food' : {
-                food : quantity
-            },
-            'last_time' : datetime.now()
-        }
+                nutrition_field = {
+                    'food': {
+                        food: quantity
+                    },
+                    'last_time': datetime.now()
+                }
+            else:
+                # Same day - preserve existing foods and add/update new one
+                existing_food = document['nutrition']['food']
+                existing_food[food] = quantity
+                nutrition_field = {
+                    'food': existing_food,
+                    'last_time': datetime.now()
+                }
+        else:
+            # First nutrition entry
+            nutrition_field = {
+                'food': {
+                    food: quantity
+                },
+                'last_time': datetime.now()
+            }
 
         utils.update(document, collection, 'nutrition', nutrition_field)
 
-        master_value = coherebot.generate_chat_response('nutrition', collection)
+        # master_value = coherebot.generate_chat_response('nutrition', collection)
 
         return jsonify(
             {
-                "message": "Updated nutrition"
+                "message": "Updated nutrition",
+                "category" : "nutrition"
             }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -178,25 +194,67 @@ def update_activity():
         email = data['email']
         activity = data['activity']
         timeSpent = int(data['timeSpent']) # TODO: make sure key is actually timeSpent
-        document = collection.find_one(
-            {'email' : email}
+        document = collection.find_one({'email': email})
+        current_time = datetime.now()
+
+        if document and 'activities' in document:
+            last_time = document['activities']['last_time']
+            if utils.is_different_day(last_time):
+                # Clear activities for new day
+                activities_update = {
+                    '$set': {
+                        'activities': {
+                            'activity': {
+                                activity: timeSpent
+                            },
+                            'last_time': current_time
+                        }
+                    }
+                }
+            else:
+                # Get existing activities if any exist
+                current_activities = {}
+                if 'activity' in document['activities']:
+                    current_activities = document['activities']['activity']
+                
+                # Add new activity while preserving others
+                current_activities[activity] = timeSpent
+                
+                activities_update = {
+                    '$set': {
+                        'activities': {
+                            'activity': current_activities,
+                            'last_time': current_time
+                        }
+                    }
+                }
+        else:
+            # First time adding activities
+            activities_update = {
+                '$set': {
+                    'activities': {
+                        'activity': {
+                            activity: timeSpent
+                        },
+                        'last_time': current_time
+                    }
+                }
+            }
+
+        # Perform the update
+        collection.update_one(
+            {'email': email},
+            activities_update,
+            upsert=True
         )
 
-        if 'activities' in document:
-            last_time = document['activities']['last_time']
+        # master_value = coherebot.generate_chat_response('activities', collection)
 
-            if utils.is_different_day(last_time):
-                utils.update(document, collection, 'activities.activity', {})
-
-        activities_field = {
-            'activity' : {
-                activity : timeSpent
-            },
-            'last_time' : datetime.now()
-        }
-
-        utils.update(document, collection, 'activities', activities_field)
-
+        return jsonify(
+            {
+                "message": "Updated activity",
+                "category" : "activities"
+            }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
