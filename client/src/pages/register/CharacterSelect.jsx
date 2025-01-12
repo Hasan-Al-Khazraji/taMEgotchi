@@ -6,12 +6,12 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import p1 from "../../assets/option2/p1.png";
-import p2 from "../../assets/option2/p2.png";
+import happy1 from "../../assets/emotions/happy/happy 1.png";
+import happy2 from "../../assets/emotions/happy/happy 2.png";
 import original from "../../assets/option1/option2.png";
 
 const animation1 = [original];
-const animation2 = [p1, p2];
+const animation2 = [happy1, happy2];
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -56,7 +56,7 @@ export default function FullWidthTabs() {
     const interval = setInterval(() => {
       setCurrentImageIndex1((prevIndex) => (prevIndex + 1) % animation1.length);
       setCurrentImageIndex2((prevIndex) => (prevIndex + 1) % animation2.length);
-    }, 1000); // Change image every second
+    }, 300); // Change image every second
     return () => clearInterval(interval);
   }, []);
 
