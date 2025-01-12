@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for, request
+from flask import Flask, redirect, render_template, session, url_for, request, jsonify
 from flask_cors import CORS
 
 ENV_FILE = find_dotenv()
@@ -15,6 +15,10 @@ if ENV_FILE:
 
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
+
+client = MongoClient(env.get('MONGO_URL'))
+database = client['user']
+collection = database['metadata']
 
 oauth = OAuth(app)
 
@@ -51,25 +55,46 @@ def register_user():
             data['character_exists'] = False
             collection.insert_one(data)
 
-            return jsonify({
-                "message": "Email registered successfully",
-                "character_exists": False
-            }), 201
+            return jsonify(
+                {
+                    "message": "Email registered successfully",
+                    "character_exists": False
+                }
+            ), 201
 
         # email exists but no associated character
         if results and results.get('character_exists', False):
-            return jsonify({
-                "message": "Email found, but no associated character",
-                "character_exists": False
-            }), 200
+            return jsonify(
+                {
+                    "message": "Email found, but no associated character",
+                    "character_exists": False
+                }
+            ), 200
 
-        return jsonify({
-            "message": "Character exists with email",
-            "character_exists": True
-        }), 200
-
+        return jsonify(
+            {
+                "message": "Character exists with email",
+                "character_exists": True
+            }
+        ), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}, status=500)
+
+# @app.route('/update-stat', method=['POST'])
+# def update_stat():
+#     try:
+#         data = request.get_json()
+
+#         if not data:
+#             return jsonify({"error": "No data provided"}), 400
+#         if "email" not in data:
+#             return jsonify({"error": f"Missing required field: email"}), 400
+
+#         email = data['email']
+
+#         results = colleciton.find_one(
+#             {'email' : email}
+#         )
 
 # @app.route()
 # def update_statistics():
@@ -116,6 +141,5 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(port=env.get("PORT", 5000))
-
     CORS(app)
+    app.run(port=env.get("PORT", 5000))
