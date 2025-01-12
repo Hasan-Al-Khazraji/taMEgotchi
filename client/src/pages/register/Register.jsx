@@ -38,7 +38,7 @@ const Register = () => {
     }
 
     // send to back-end and change page here
-    // window.location.href = '/';
+    window.location.href = '/mepet';
   };
 
   return (
