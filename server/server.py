@@ -4,7 +4,6 @@ from os import environ as env
 from urllib.parse import quote_plus, urlencode
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, request, jsonify
@@ -155,9 +154,21 @@ def logout():
         )
     )
 
-@app.route("/api/mepet")
+@app.route("/api/mepet", methods=["POST"])
 def mepet():
-    return jsonify({"mepet": ""})
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    if "email" not in data:
+        return jsonify({"error": f"Missing required field: email"}), 400
+    
+    email = data['email']
+
+
+    record = collection.find_one({'email' : email})
+    if not record:
+        return jsonify({"mepet": ""}), 201
+    return jsonify({"mepet": record["name"]}), 200
 
 @app.route("/")
 def home():
