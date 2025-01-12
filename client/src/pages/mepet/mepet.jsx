@@ -21,10 +21,11 @@ export default function Mepet() {
         e.preventDefault();
         const formData = {
             activity: e.target.elements[0].value,
-            timeSpent: e.target.elements[1].value
+            timeSpent: e.target.elements[1].value,
+            email: user.email
         };
 
-        await fetch('http://localhost:5000/api/activity', {
+        await fetch('http://localhost:5000/update-activity', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ export default function Mepet() {
         e.preventDefault();
         const formData = {
             activity: e.target.elements[0].value,
-            timeSpent: e.target.elements[1].value,
+            quantity: e.target.elements[1].value,
             email: user.email
         };
 

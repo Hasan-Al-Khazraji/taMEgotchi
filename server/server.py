@@ -8,8 +8,9 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, request, jsonify
 from flask_cors import CORS
-import sleep
-from datetime import date
+from datetime import datetime
+import utils
+import coherebot
 
 
 ENV_FILE = find_dotenv()
@@ -103,44 +104,101 @@ def update_sleep():
             last_time = document['sleep']['last_time']
             prev_hours = int(document['sleep']['hours'])
             
-            if not sleep.is_different_day(last_time):
+            if not utils.is_different_day(last_time):
                 hours += prev_hours
 
-        sleep.update(document, collection, hours)
+        sleep_field = {
+            'hours' : hours,
+            'is_valid' : hours >= 8,
+            'last_time' : datetime.now()
+        }
 
-        return jsonify({"message": "Updated sleep"}), 200
+        utils.update(document, collection, 'sleep', sleep_field)
+
+        master_value = coherebot.generate_chat_response('sleep', collection)
+
+        return jsonify(
+            {
+                "message": "Updated sleep"
+            }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route('/update-nutrition', methods=['POST'])
 def update_nutrition():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-    if "email" not in data:
-        return jsonify({"error": f"Missing required field: email"}), 400
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        if "email" not in data:
+            return jsonify({"error": f"Missing required field: email"}), 400
 
-    email = data['email']
+        email = data['email']
+        food = data['activity']
+        quantity = int(data['quantity']) # TODO: make sure key is actually quantity
+        document = collection.find_one(
+            {'email' : email}
+        )
 
-    results = collection.find_one(
-        {'email' : email}
-    )
+        if 'nutrition' in document:
+            last_time = document['nutrition']['last_time']
+
+            if utils.is_different_day(last_time):
+                utils.update(document, collection, 'nutrition.food', {})
+
+        nutrition_field = {
+            'food' : {
+                food : quantity
+            },
+            'last_time' : datetime.now()
+        }
+
+        utils.update(document, collection, 'nutrition', nutrition_field)
+
+        master_value = coherebot.generate_chat_response('nutrition', collection)
+
+        return jsonify(
+            {
+                "message": "Updated nutrition"
+            }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/update-activity', methods=['POST'])
 def update_activity():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-    if "email" not in data:
-        return jsonify({"error": f"Missing required field: email"}), 400
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        if "email" not in data:
+            return jsonify({"error": f"Missing required field: email"}), 400
 
-    email = data['email']
+        email = data['email']
+        activity = data['activity']
+        timeSpent = int(data['timeSpent']) # TODO: make sure key is actually timeSpent
+        document = collection.find_one(
+            {'email' : email}
+        )
 
-    results = collection.find_one(
-        {'email' : email}
-    )
+        if 'activities' in document:
+            last_time = document['activities']['last_time']
+
+            if utils.is_different_day(last_time):
+                utils.update(document, collection, 'activities.activity', {})
+
+        activities_field = {
+            'activity' : {
+                activity : timeSpent
+            },
+            'last_time' : datetime.now()
+        }
+
+        utils.update(document, collection, 'activities', activities_field)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/login")
 def login():
