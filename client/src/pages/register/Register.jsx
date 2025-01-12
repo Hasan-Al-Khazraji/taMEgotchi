@@ -1,18 +1,38 @@
 import React, { useState } from 'react';
 import TextInput from './TextInput';
 import Submit from './Submit';
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', age: '', occupation: '' });
+  const { user } = useAuth0();
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    formData['email'] = user.email
     const jsonData = JSON.stringify(formData, null, 2);
-    console.log(jsonData);
+
+    try {
+      const response = await fetch('http://localhost:5000/register-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonData,
+      });
+
+      // const jsonResponse = await response.json();
+      // console.log(jsonResponse);
+    } catch(error){
+      console.error('Network Error:', error);
+      alert('Failed to submit data. Please try again later.');
+    }
+
     // send to back-end and change page here
     // window.location.href = '/';
   };
