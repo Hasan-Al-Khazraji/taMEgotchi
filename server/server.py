@@ -10,6 +10,7 @@ from flask import Flask, redirect, render_template, session, url_for, request, j
 from flask_cors import CORS
 import sleep
 from datetime import date
+import cohere
 
 
 ENV_FILE = find_dotenv()
@@ -18,10 +19,14 @@ if ENV_FILE:
 
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
-
 client = MongoClient(env.get('MONGO_URL'), server_api=ServerApi('1'))
 database = client['user']
 collection = database['metadata']
+promptEngineer = env.get("promptEngineer")
+COHERE_API_KEY = env.get("COHERE_API_KEY")
+if COHERE_API_KEY is None:
+    raise ValueError("COHERE_API_KEY environment variable not found")
+co = cohere.Client(COHERE_API_KEY)
 
 oauth = OAuth(app)
 
@@ -107,6 +112,8 @@ def update_sleep():
                 hours += prev_hours
 
         sleep.update(document, collection, hours)
+        master_value = generate_chat_response(document['sleep'])
+        sleep.update(document, collection, master_value)
 
         return jsonify({"message": "Updated sleep"}), 200
     except Exception as e:
@@ -197,7 +204,29 @@ def activity():
 def home():
     return render_template("home.html", session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
-
 if __name__ == '__main__':
     CORS(app)
     app.run(port=env.get("PORT", 5000))
+
+def generate_chat_response(data):
+    combined = f"{promptEngineer}\n\n{data}"
+
+    try:
+        response = co.generate(
+            model='command-xlarge',
+            prompt=combined,
+            max_tokens=50,
+            temperature=0.3,
+            k=0,
+            p=0.9,
+            frequency_penalty=0.1,
+            presence_penalty=0.1,
+            stop_sequences=["}"]
+        )
+
+        response = response.generations[0].text.strip()
+        return response[:response.find('}') + 1]
+    except Exception as e:
+        print(f"Error details: {e}")
+        return f"Error generating response: {e}"
+    
