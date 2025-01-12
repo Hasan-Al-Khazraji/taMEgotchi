@@ -13,75 +13,91 @@ export default function Mepet() {
     const [showFoodForm, setShowFoodForm] = useState(false);
     const [showSleepForm, setShowSleepForm] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const { user } = useAuth0();
 
     // Form fields need changing
     async function handleActivitySubmit(e) {
         e.preventDefault();
+        setIsLoading(true);
+
         const formData = {
             activity: e.target.elements[0].value,
             timeSpent: e.target.elements[1].value,
             email: user.email
         };
 
-        await fetch('http://localhost:5000/update-activity', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                setShowActivityForm(false);
-            })
-            .catch(error => console.error('Error:', error));
+        try {
+            const response = await fetch('http://localhost:5000/update-activity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+            setShowActivityForm(false);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     // Form fields need changing
     async function handleFoodSubmit(e) {
         e.preventDefault();
+        setIsLoading(true);
+        
         const formData = {
             activity: e.target.elements[0].value,
             quantity: e.target.elements[1].value,
             email: user.email
         };
 
-        await fetch('http://localhost:5000/update-nutrition', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                setShowFoodForm(false);
-            })
-            .catch(error => console.error('Error:', error));
+        try {
+            const response = await fetch('http://localhost:5000/update-nutrition', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+            setShowFoodForm(false);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     async function handleSleepSubmit(e) {
         e.preventDefault();
+        setIsLoading(true);
+        
         const formData = {
             activity: e.target.elements[0].value,
             hours: e.target.elements[1].value,
             email: user.email
         };
 
-        await fetch('http://localhost:5000/update-sleep', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                setShowSleepForm(false);
-            })
-            .catch(error => console.error('Error:', error));
+        try {
+            const response = await fetch('http://localhost:5000/update-sleep', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+            setShowSleepForm(false);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
@@ -114,7 +130,7 @@ export default function Mepet() {
                             <h2 className="text-xl mb-4">Activity</h2>
                             <input type="text" placeholder="What you did" className="block mb-2 p-2 border rounded" />
                             <input type="text" placeholder="Time spent on activity" className="block mb-2 p-2 border rounded" />
-                            <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                            {isLoading ? <button type="submit" disabled className="bg-purple-800 text-white px-4 py-2 rounded mr-2">Loading</button> : <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>}
                             <button className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl" onClick={() => setShowActivityForm(false)}>✕</button>
                         </div>
                     </div>
@@ -127,7 +143,7 @@ export default function Mepet() {
                             <h2 className="text-xl mb-4">Nutrition</h2>
                             <input type="text" placeholder="What you ate" className="block mb-2 p-2 border rounded" />
                             <input type="text" placeholder="Amount you ate" className="block mb-2 p-2 border rounded" />
-                            <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                            {isLoading ? <button type="submit" disabled className="bg-purple-800 text-white px-4 py-2 rounded mr-2">Loading</button> : <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>}
                             <button className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl" onClick={() => setShowFoodForm(false)}>✕</button>
                         </div>
                     </div>
@@ -140,7 +156,7 @@ export default function Mepet() {
                             <h2 className="text-xl mb-4">Sleep</h2>
                             <input type="hidden" value="Slept" className="block mb-2 p-2 border rounded" />
                             <input type="text" placeholder="Time spent sleeping" className="block mb-2 p-2 border rounded" />
-                            <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                            {isLoading ? <button type="submit" disabled className="bg-purple-800 text-white px-4 py-2 rounded mr-2">Loading</button> : <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>}
                             <button className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl" onClick={() => setShowSleepForm(false)}>✕</button>
                         </div>
                     </div>
