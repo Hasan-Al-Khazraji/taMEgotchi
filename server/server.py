@@ -2,7 +2,8 @@
 import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
-from pymongo import MongoClient
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
@@ -16,7 +17,7 @@ if ENV_FILE:
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
 
-client = MongoClient(env.get('MONGO_URL'))
+client = MongoClient(env.get('MONGO_URL'), server_api=ServerApi('1'))
 database = client['user']
 collection = database['metadata']
 
@@ -52,7 +53,7 @@ def register_user():
 
         # email not found in db
         if not results:
-            data['character_exists'] = False
+            data['character_exists'] = True
             collection.insert_one(data)
 
             return jsonify(
@@ -80,50 +81,52 @@ def register_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# @app.route('/update-sleep', method=['POST'])
-# def update_sleep():
-#     data = request.get_json()
+@app.route('/update-sleep', methods=['POST'])
+def update_sleep():
+    data = request.get_json()
 
-#     if not data:
-#         return jsonify({"error": "No data provided"}), 400
-#     if "email" not in data:
-#         return jsonify({"error": f"Missing required field: email"}), 400
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    if "email" not in data:
+        return jsonify({"error": f"Missing required field: email"}), 400
 
-#     email = data['email']
+    email = data['email']
 
-#     results = colleciton.find_one(
-#         {'email' : email}
-#     )
+    results = colleciton.find_one(
+        {'email' : email}
+    )
 
-# @app.route('/update-nutrition', method=['POST'])
-# def update_nutrition():
-#     data = request.get_json()
+    prev_sleep = results.get('sleep', 100)
 
-#     if not data:
-#         return jsonify({"error": "No data provided"}), 400
-#     if "email" not in data:
-#         return jsonify({"error": f"Missing required field: email"}), 400
+@app.route('/update-nutrition', methods=['POST'])
+def update_nutrition():
+    data = request.get_json()
 
-#     email = data['email']
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    if "email" not in data:
+        return jsonify({"error": f"Missing required field: email"}), 400
 
-#     results = colleciton.find_one(
-#         {'email' : email}
-#     )
+    email = data['email']
 
-# @app.route('/update-activity', method=['POST'])
-# def update_activity():
-#     data = request.get_json()
+    results = colleciton.find_one(
+        {'email' : email}
+    )
 
-#     if not data:
-#         return jsonify({"error": "No data provided"}), 400
-#     if "email" not in data:
-#         return jsonify({"error": f"Missing required field: email"}), 400
+@app.route('/update-activity', methods=['POST'])
+def update_activity():
+    data = request.get_json()
 
-#     email = data['email']
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    if "email" not in data:
+        return jsonify({"error": f"Missing required field: email"}), 400
 
-#     results = colleciton.find_one(
-#         {'email' : email}
-#     )
+    email = data['email']
+
+    results = colleciton.find_one(
+        {'email' : email}
+    )
 
 @app.route("/login")
 def login():
