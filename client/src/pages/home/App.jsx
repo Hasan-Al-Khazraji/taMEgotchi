@@ -43,7 +43,7 @@ function App() {
           >
             Take me!
           </button>
-          <span className="absolute bottom-0 right-0 m-4 bg-red-400 rounded-lg p-2 hover:bg-red-500 hover:scale-110 transform transition duration-100">
+          <span className="absolute -bottom-10 -right-9">
             <LogoutButton></LogoutButton>
           </span>
         </div>
