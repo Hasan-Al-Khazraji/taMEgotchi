@@ -9,10 +9,11 @@ function App() {
   async function mepetExists() {
     try {
       const response = await fetch("http://localhost:5000/api/mepet", {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ email: user.email }),
       });
       const data = await response.json();
       if (data.mepet) {
