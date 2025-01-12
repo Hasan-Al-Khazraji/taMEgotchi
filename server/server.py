@@ -78,23 +78,52 @@ def register_user():
             }
         ), 200
     except Exception as e:
-        return jsonify({"error": str(e)}, status=500)
+        return jsonify({"error": str(e)}), 500
 
-# @app.route('/update-stat', method=['POST'])
-# def update_stat():
-#     try:
-#         data = request.get_json()
+# @app.route('/update-sleep', method=['POST'])
+# def update_sleep():
+#     data = request.get_json()
 
-#         if not data:
-#             return jsonify({"error": "No data provided"}), 400
-#         if "email" not in data:
-#             return jsonify({"error": f"Missing required field: email"}), 400
+#     if not data:
+#         return jsonify({"error": "No data provided"}), 400
+#     if "email" not in data:
+#         return jsonify({"error": f"Missing required field: email"}), 400
 
-#         email = data['email']
+#     email = data['email']
 
-#         results = colleciton.find_one(
-#             {'email' : email}
-#         )
+#     results = colleciton.find_one(
+#         {'email' : email}
+#     )
+
+# @app.route('/update-nutrition', method=['POST'])
+# def update_nutrition():
+#     data = request.get_json()
+
+#     if not data:
+#         return jsonify({"error": "No data provided"}), 400
+#     if "email" not in data:
+#         return jsonify({"error": f"Missing required field: email"}), 400
+
+#     email = data['email']
+
+#     results = colleciton.find_one(
+#         {'email' : email}
+#     )
+
+# @app.route('/update-activity', method=['POST'])
+# def update_activity():
+#     data = request.get_json()
+
+#     if not data:
+#         return jsonify({"error": "No data provided"}), 400
+#     if "email" not in data:
+#         return jsonify({"error": f"Missing required field: email"}), 400
+
+#     email = data['email']
+
+#     results = colleciton.find_one(
+#         {'email' : email}
+#     )
 
 @app.route("/login")
 def login():
