@@ -6,6 +6,7 @@ import Login from './pages/login/Login';
 import Register from './pages/register/Register';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Auth0Provider } from '@auth0/auth0-react';
+import Mepet from './pages/mepet/mepet';
 
 const root = createRoot(document.getElementById('root'));
 
@@ -23,6 +24,7 @@ root.render(
           <Route path="/" element={<App />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/mepet" element={<Mepet />} />
         </Routes>
       </Router>
     </React.StrictMode>
