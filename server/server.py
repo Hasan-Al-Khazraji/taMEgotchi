@@ -115,7 +115,7 @@ def update_sleep():
 
         utils.update(document, collection, 'sleep', sleep_field)
 
-        # master_value = coherebot.generate_chat_response('sleep', collection)
+        master_value = coherebot.generate_chat_response('sleep', collection)
 
         return jsonify(
             {
@@ -171,7 +171,7 @@ def update_nutrition():
 
         utils.update(document, collection, 'nutrition', nutrition_field)
 
-        # master_value = coherebot.generate_chat_response('nutrition', collection)
+        master_value = coherebot.generate_chat_response('nutrition', collection)
 
         return jsonify(
             {
@@ -248,7 +248,7 @@ def update_activity():
             upsert=True
         )
 
-        # master_value = coherebot.generate_chat_response('activities', collection)
+        master_value = coherebot.generate_chat_response('activities', collection)
 
         return jsonify(
             {

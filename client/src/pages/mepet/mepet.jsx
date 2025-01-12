@@ -17,6 +17,7 @@ import hungry1 from "../../assets/emotions/hungry/hungry 1.png";
 import hungry2 from "../../assets/emotions/hungry/hungry 2.png";
 import { useTheme } from "@mui/material/styles";
 import * as React from "react";
+import Message from "./component/message";
 
 const animation1 = [happy1, happy2];
 const animation2 = [tired1, tired2];
@@ -35,12 +36,12 @@ export default function Mepet() {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
   const [currentImageIndex1, setCurrentImageIndex1] = React.useState(0);
-  const [currentImageIndex2, setCurrentImageIndex2] = React.useState(0);
+  const [imageEmotion, setImageEmotion] = useState(animation1);
+  const [textMessage, setTextMessage] = useState("What did we do today!");
 
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex1((prevIndex) => (prevIndex + 1) % animation1.length);
-      setCurrentImageIndex2((prevIndex) => (prevIndex + 1) % animation2.length);
     }, 300); // Change image every second
     return () => clearInterval(interval);
   }, []);
@@ -48,6 +49,25 @@ export default function Mepet() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const handleImageChange = (emotion) => {
+    if (emotion === "happy") {
+      setImageEmotion(animation1)
+      setTextMessage("Had lots of fun today!");
+    } else if (emotion === "tired") {
+      setImageEmotion(animation2)
+      setTextMessage("...");
+    }
+    else if (emotion === "lazy") {
+      setImageEmotion(animation3)
+      setTextMessage("I don't feel like doing anything today...");
+    }
+    else if (emotion === "hungry") {
+      setImageEmotion(animation4)
+      setTextMessage("What's for dinner? I am hungry!");
+    }
+  };
+
 
   // Form fields need changing
   async function handleActivitySubmit(e) {
@@ -69,6 +89,7 @@ export default function Mepet() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
+      handleImageChange("happy");
       setShowActivityForm(false);
     } catch (error) {
       console.error("Error:", error);
@@ -97,6 +118,7 @@ export default function Mepet() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
+      handleImageChange("hungry");
       setShowFoodForm(false);
     } catch (error) {
       console.error("Error:", error);
@@ -124,6 +146,7 @@ export default function Mepet() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
+      handleImageChange("tired");
       setShowSleepForm(false);
     } catch (error) {
       console.error("Error:", error);
@@ -139,12 +162,15 @@ export default function Mepet() {
         id="mepet-pen"
         className="flex justify-center items-center space-x-8"
       >
-        <img
-          src={animation1[currentImageIndex1]}
-          alt={`p${currentImageIndex1 + 1}`}
-          style={{ borderRadius: "8px" }}
-          className="mx-auto"
-        />
+        <div>
+          <Message text={textMessage}></Message>
+          <img
+            src={imageEmotion[currentImageIndex1]}
+            alt={`p${currentImageIndex1 + 1}`}
+            style={{ borderRadius: "8px" }}
+            className="mx-auto"
+          />
+        </div>
       </div>
       <div
         id="dashboard"
@@ -317,44 +343,10 @@ export default function Mepet() {
           <div className="rounded-lg text-black w-3/5">
             <h2 className="text-3xl mb-4 text-white">Information:</h2>
             <hr className="bg-white my-3" />
+            <a href="https://www.psychologytoday.com/us/blog/between-cultures/201805/in-helping-others-you-help-yourself" target="_blank" className="text-xl text-white underline">In Helping Others, You Help Yourself</a>
+            <h2 className="text-lg text-white">Marianna Pogosyan Ph.D.</h2>
             <p className="text-white font-thin">
-              Lorem ipsum odor amet, consectetuer adipiscing elit. Accumsan
-              rutrum torquent aptent diam, erat malesuada. Ipsum imperdiet dolor
-              interdum viverra pulvinar. Nec ad sapien enim laoreet praesent,
-              mauris felis primis. Dapibus penatibus neque, dui pulvinar maximus
-              habitant quis montes eros. Nascetur hac neque gravida feugiat
-              litora? Risus pretium morbi; eleifend tristique ex gravida. Mauris
-              quisque libero posuere, habitasse pretium mi. Malesuada sociosqu
-              enim quisque lorem sapien congue tellus per. Phasellus aliquet
-              tristique curabitur nunc cras rutrum ultrices. Maecenas sit
-              molestie consectetur eros natoque. Morbi dictumst eleifend
-              penatibus senectus, ultrices posuere sollicitudin. Morbi ornare
-              etiam aptent laoreet fermentum nisi commodo egestas duis. Ipsum
-              sodales himenaeos odio lacus felis mollis ut. Neque blandit erat
-              eget congue turpis leo pulvinar nostra. Porttitor elementum sem
-              aliquam molestie imperdiet cubilia posuere conubia. Potenti nibh
-              porta, tempus mauris consectetur hendrerit. Primis sapien gravida
-              tellus placerat, augue interdum scelerisque ut. Vestibulum diam
-              nullam efficitur iaculis orci. Netus lacinia torquent in potenti
-              tincidunt tempus vulputate molestie. Fermentum adipiscing massa
-              turpis inceptos mi justo nulla metus. Vehicula inceptos faucibus
-              lacinia fringilla semper. Nam interdum sem lacus vitae nam rutrum
-              dictum. Facilisis cras donec orci nulla rutrum ad natoque ex. Urna
-              a augue enim et ligula est quis. Erat malesuada nisi taciti duis
-              quis. Nullam elementum morbi taciti elementum mattis efficitur!
-              Cursus nascetur dictumst faucibus natoque facilisi congue. Ornare
-              nam curabitur sit gravida nullam viverra quam. Neque fusce lectus
-              nisl dolor nascetur. Luctus hendrerit pretium nisi porta fringilla
-              eu faucibus donec. Tincidunt neque auctor dictumst hendrerit
-              sollicitudin mollis. Sociosqu fringilla sagittis lectus
-              ullamcorper sem curae vel. Quis himenaeos arcu ipsum mi inceptos
-              ultricies blandit viverra. Vitae faucibus egestas ad magna
-              pellentesque feugiat pharetra curabitur. Maximus lectus integer
-              mattis dui posuere dis ante. Dolor dictumst cubilia donec natoque
-              massa tincidunt? Finibus auctor aliquam torquent placerat aptent
-              felis potenti? Mus adipiscing nam luctus; ipsum tortor metus.
-              Phasellus est taciti convallis rhoncus dapibus vehicula semper
-              fames.
+              Helping others can boost our own well-being by reinforcing our sense of relatedness and meeting psychological needs. Research shows that acts of generosity, such as volunteering or donating, enhance happiness and reduce depression. Additionally, helping others regulate their emotions can improve our own emotional regulation and well-being. A study found that providing emotional support online led to better emotional and cognitive outcomes for the helpers, reducing their depression and increasing happiness. Using other-focused language in support messages was particularly effective. Thus, helping others not only benefits them but also enhances our own emotional health.
             </p>
           </div>
         </div>
