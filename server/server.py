@@ -96,18 +96,6 @@ def register_user():
 #             {'email' : email}
 #         )
 
-# @app.route()
-# def update_statistics():
-#     try:
-#         data = request.json
-
-#         if not data:
-#             return jsonify({"error": "No data provided"}), 400
-
-#         required_fields = ["hunger", "activity", "productivity"]
-#         if not all(field in data for field in required_fields):
-#             return jsonify({"error": f"Missing required fields: {required_fields}"}), 400
-
 @app.route("/login")
 def login():
     return oauth.auth0.authorize_redirect(
