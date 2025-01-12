@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 const LoginButton = () => {
   const {user, loginWithRedirect } = useAuth0();
@@ -23,7 +24,7 @@ const LoginButton = () => {
     };
     }
 
-  return <button onClick={handleClick}>Log In</button>;
+  return <button onClick={handleClick} className="scale-250 p-10"><PlayArrowIcon></PlayArrowIcon></button>;
 };
 
 export default LoginButton;
