@@ -8,7 +8,7 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, request, jsonify
 from flask_cors import CORS
-from . import sleep
+import sleep
 from datetime import date
 
 
@@ -94,16 +94,19 @@ def update_sleep():
             return jsonify({"error": f"Missing required field: email"}), 400
 
         email = data['email']
+        hours = int(data['hours'])
         document = collection.find_one(
             {'email' : email}
         )
 
-        if 'sleep' not in document:
-            document = sleep.initialize(document, collection)
+        if 'sleep' in document:
+            last_time = document['sleep']['last_time']
+            prev_hours = int(document['sleep']['hours'])
+            
+            if not sleep.is_different_day(last_time):
+                hours += prev_hours
 
-        last_time, prev_hours = document['sleep']['last_time'], document['sleep']['hours']
-        total_hours = data['hours'] if sleep.is_different_day(last_time) else data['hours'] + prev_hours
-        sleep.update(document, collection, total_hours)
+        sleep.update(document, collection, hours)
 
         return jsonify({"message": "Updated sleep"}), 200
     except Exception as e:
