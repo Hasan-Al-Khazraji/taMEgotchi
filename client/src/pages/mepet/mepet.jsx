@@ -115,6 +115,7 @@ export default function Mepet() {
                             <input type="text" placeholder="What you did" className="block mb-2 p-2 border rounded" />
                             <input type="text" placeholder="Time spent on activity" className="block mb-2 p-2 border rounded" />
                             <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                            <button className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl" onClick={() => setShowActivityForm(false)}>✕</button>
                         </div>
                     </div>
                 </form>
@@ -127,6 +128,7 @@ export default function Mepet() {
                             <input type="text" placeholder="What you ate" className="block mb-2 p-2 border rounded" />
                             <input type="text" placeholder="Amount you ate" className="block mb-2 p-2 border rounded" />
                             <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                            <button className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl" onClick={() => setShowFoodForm(false)}>✕</button>
                         </div>
                     </div>
                 </form>
@@ -139,6 +141,7 @@ export default function Mepet() {
                             <input type="hidden" value="Slept" className="block mb-2 p-2 border rounded" />
                             <input type="text" placeholder="Time spent sleeping" className="block mb-2 p-2 border rounded" />
                             <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                            <button className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl" onClick={() => setShowSleepForm(false)}>✕</button>
                         </div>
                     </div>
                 </form>
