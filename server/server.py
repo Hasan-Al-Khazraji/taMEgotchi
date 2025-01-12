@@ -8,6 +8,9 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, request, jsonify
 from flask_cors import CORS
+from . import sleep
+from datetime import date
+
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -82,20 +85,29 @@ def register_user():
 
 @app.route('/update-sleep', methods=['POST'])
 def update_sleep():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-    if "email" not in data:
-        return jsonify({"error": f"Missing required field: email"}), 400
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        if "email" not in data:
+            return jsonify({"error": f"Missing required field: email"}), 400
 
-    email = data['email']
+        email = data['email']
+        document = collection.find_one(
+            {'email' : email}
+        )
 
-    results = colleciton.find_one(
-        {'email' : email}
-    )
+        if 'sleep' not in document:
+            document = sleep.initialize(document, collection)
 
-    prev_sleep = results.get('sleep', 100)
+        last_time, prev_hours = document['sleep']['last_time'], document['sleep']['hours']
+        total_hours = data['hours'] if sleep.is_different_day(last_time) else data['hours'] + prev_hours
+        sleep.update(document, collection, total_hours)
+
+        return jsonify({"message": "Updated sleep"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/update-nutrition', methods=['POST'])
 def update_nutrition():
@@ -108,7 +120,7 @@ def update_nutrition():
 
     email = data['email']
 
-    results = colleciton.find_one(
+    results = collection.find_one(
         {'email' : email}
     )
 
@@ -123,7 +135,7 @@ def update_activity():
 
     email = data['email']
 
-    results = colleciton.find_one(
+    results = collection.find_one(
         {'email' : email}
     )
 
