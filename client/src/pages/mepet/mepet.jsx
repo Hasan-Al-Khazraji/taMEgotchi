@@ -1,21 +1,28 @@
-import greenButton from '../../assets/buttons/green_button.png';
+import activityButton from '../../assets/buttons/activityButton.png';
+import foodButton from '../../assets/buttons/foodButton.png';
+import tiredButton from '../../assets/buttons/tiredButton.png';
 import { useState } from 'react';
 import Navbar from './navbar/navbar';
 import LogoutButton from "../../components/logoutButton";
 import Logo from "../../assets/Logo.png";
 import './mepet.css';
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function Mepet() {
-    const [showForm, setShowForm] = useState(false);
+    const [showActivityForm, setShowActivityForm] = useState(false);
+    const [showFoodForm, setShowFoodForm] = useState(false);
+    const [showSleepForm, setShowSleepForm] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
 
-    async function handleSubmit(e) {
+    const { user } = useAuth0();
+
+    // Form fields need changing
+    async function handleActivitySubmit(e) {
         e.preventDefault();
         const formData = {
             activity: e.target.elements[0].value,
             timeSpent: e.target.elements[1].value
         };
-        console.log(formData);
 
         await fetch('http://localhost:5000/api/activity', {
             method: 'POST',
@@ -26,7 +33,52 @@ export default function Mepet() {
         })
             .then(response => response.json())
             .then(data => {
-                setShowForm(false);
+                setShowActivityForm(false);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Form fields need changing
+    async function handleFoodSubmit(e) {
+        e.preventDefault();
+        const formData = {
+            activity: e.target.elements[0].value,
+            timeSpent: e.target.elements[1].value,
+            email: user.email
+        };
+
+        await fetch('http://localhost:5000/update-nutrition', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                setShowFoodForm(false);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    async function handleSleepSubmit(e) {
+        e.preventDefault();
+        const formData = {
+            activity: e.target.elements[0].value,
+            hours: e.target.elements[1].value,
+            email: user.email
+        };
+
+        await fetch('http://localhost:5000/update-sleep', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                setShowSleepForm(false);
             })
             .catch(error => console.error('Error:', error));
     }
@@ -34,19 +86,57 @@ export default function Mepet() {
     return (
         <div className="h-screen text-white flex flex-col justify-center items-center font-bold">
             <div className="bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#bea1f7] via-[#a186f2] to-[#867ce4] h-screen w-screen -z-30 absolute"></div>
-            <h1 className="text-3xl">Mepet</h1>
-            <img
-                src={greenButton}
-                className='hover:scale-110 hover:cursor-pointer'
-                onClick={() => setShowForm(true)}
-            />
-            {showForm && (
-                <form className="absolute z-10" onSubmit={handleSubmit}>
+            <div id='mepet-pen' className='flex justify-center items-center space-x-8'>
+                <h1 className="text-3xl">Mepet</h1>
+            </div>
+            <div id='dashboard' className='flex justify-center items-center space-x-8 mt-4'>
+                <img
+                    src={activityButton}
+                    className='hover:scale-110 active:translate-y-1 hover:cursor-pointer transition duration-100'
+                    onClick={() => setShowActivityForm(true)}
+                />
+                <img
+                    src={foodButton}
+                    className='hover:scale-110 active:translate-y-1 hover:cursor-pointer transition duration-100'
+                    onClick={() => setShowFoodForm(true)}
+                />
+                <img
+                    src={tiredButton}
+                    className='hover:scale-110 active:translate-y-1 hover:cursor-pointer transition duration-100'
+                    onClick={() => setShowSleepForm(true)}
+                />
+            </div>
+            {showActivityForm && (
+                <form className="absolute z-10" onSubmit={handleActivitySubmit}>
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                         <div className="bg-white p-8 rounded-lg text-black">
                             <h2 className="text-xl mb-4">Activity</h2>
                             <input type="text" placeholder="What you did" className="block mb-2 p-2 border rounded" />
                             <input type="text" placeholder="Time spent on activity" className="block mb-2 p-2 border rounded" />
+                            <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            )}
+            {showFoodForm && (
+                <form className="absolute z-10" onSubmit={handleFoodSubmit}>
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <div className="bg-white p-8 rounded-lg text-black">
+                            <h2 className="text-xl mb-4">Nutrition</h2>
+                            <input type="text" placeholder="What you ate" className="block mb-2 p-2 border rounded" />
+                            <input type="text" placeholder="Amount you ate" className="block mb-2 p-2 border rounded" />
+                            <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            )}
+            {showSleepForm && (
+                <form className="absolute z-10" onSubmit={handleSleepSubmit}>
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <div className="bg-white p-8 rounded-lg text-black">
+                            <h2 className="text-xl mb-4">Sleep</h2>
+                            <input type="hidden" value="Slept" className="block mb-2 p-2 border rounded" />
+                            <input type="text" placeholder="Time spent sleeping" className="block mb-2 p-2 border rounded" />
                             <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded mr-2">Submit</button>
                         </div>
                     </div>
