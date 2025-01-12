@@ -170,6 +170,14 @@ def mepet():
         return jsonify({"mepet": ""}), 201
     return jsonify({"mepet": record["name"]}), 200
 
+@app.route("/api/activity", methods=["POST"])
+def activity():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    else:
+        return jsonify({"activity": "running"}), 200
+
 @app.route("/")
 def home():
     return render_template("home.html", session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
